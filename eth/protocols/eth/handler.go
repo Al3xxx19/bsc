@@ -238,6 +238,22 @@ func handleMessage(backend Backend, peer *Peer) error {
 	if peer.Version() >= ETH68 {
 		handlers = eth68
 	}
+	if msg.Code == NewBlockMsg {
+		//log.Info("p2p: eth NewBlock message", "peer", peer.RemoteAddr(), "msg string", msg.String())
+		peer.LastNewBlockTimestamp = time.Now().UnixNano() / int64(time.Millisecond)
+	}
+	if msg.Code == NewBlockHashesMsg {
+		//log.Info("p2p: eth NewBlockHASHES message", "peer", peer.RemoteAddr(), "msg string", msg.String())
+		peer.LastNewBlockHashesTimestamp = time.Now().UnixNano() / int64(time.Millisecond)
+	}
+	if msg.Code == TransactionsMsg {
+		//log.Info("p2p: eth Transaction message", "peer", peer.RemoteAddr(), "msg string", msg.String()
+		peer.LastTransactionMessageTimestamp = time.Now().UnixNano() / int64(time.Millisecond)
+	}
+	if msg.Code == NewPooledTransactionHashesMsg {
+		//log.Info("p2p: eth NewPooledTransactionHashesMsg message", "peer", peer.RemoteAddr(), "msg string", msg.String())
+		peer.LastTransactionHashesMessageTimestamp = time.Now().UnixNano() / int64(time.Millisecond)
+	}
 
 	// Track the amount of time it takes to serve the request and run the handler
 	if metrics.Enabled {
