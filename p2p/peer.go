@@ -115,6 +115,11 @@ type Peer struct {
 	pingRecv chan struct{}
 	disc     chan DiscReason
 
+	LastNewBlockTimestamp                 int64    `json:"lastNewBlockTimestamp"`
+	LastNewBlockHashesTimestamp           int64    `json:"lastNewBlockHashesTimestamp"`
+	LastTransactionMessageTimestamp       int64    `json:"lastTransactionMessageTimestamp"`
+	LastTransactionHashesMessageTimestamp int64    `json:"lastTransactionHashesMessageTimestamp"`
+	
 	// events receives message send / receive events if set
 	events         *event.Feed
 	testPipe       *MsgPipeRW // for testing
@@ -531,6 +536,10 @@ type PeerInfo struct {
 	ID      string   `json:"id"`            // Unique node identifier
 	Name    string   `json:"name"`          // Name of the node, including client type, version, OS, custom data
 	Caps    []string `json:"caps"`          // Protocols advertised by this peer
+	LastNewBlockTimestamp                 int64    `json:"lastNewBlockTimestamp"`           // timestamp in millis the peer send the last newBlock announcement
+	LastNewBlockHashesTimestamp           int64    `json:"lastNewBlockHashesTimestamp"`     // timestamp in millis the peer send the last newBlockHash announcement
+	LastTransactionMessageTimestamp       int64    `json:"lastTransactionMessageTimestamp"` // timestamp of last txn message
+	LastTransactionHashesMessageTimestamp int64    `json:"lastTransactionHashesMessageTimestamp"`
 	Network struct {
 		LocalAddress  string `json:"localAddress"`  // Local endpoint of the TCP data connection
 		RemoteAddress string `json:"remoteAddress"` // Remote endpoint of the TCP data connection
@@ -550,10 +559,14 @@ func (p *Peer) Info() *PeerInfo {
 	}
 	// Assemble the generic peer metadata
 	info := &PeerInfo{
-		Enode:     p.Node().URLv4(),
-		ID:        p.ID().String(),
-		Name:      p.Fullname(),
-		Caps:      caps,
+		Enode:     				p.Node().URLv4(),
+		ID:        				p.ID().String(),
+		Name:      				p.Fullname(),
+		Caps:      				caps,
+		LastNewBlockTimestamp:  		p.LastNewBlockTimestamp,
+		LastTransactionMessageTimestamp:        p.LastTransactionMessageTimestamp,
+		LastNewBlockHashesTimestamp:            p.LastNewBlockHashesTimestamp,
+		LastTransactionHashesMessageTimestamp:  p.LastTransactionHashesMessageTimestamp,
 		Protocols: make(map[string]interface{}, len(p.running)),
 	}
 	if p.Node().Seq() > 0 {
